@@ -15,7 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useGetTransferRequestsQuery, useExecuteTransferRequestMutation, type TransferStatus } from "@/lib/store/api/muralPayApi"
+import { 
+  useGetTransferRequestsQuery, 
+  useExecuteTransferRequestMutation, 
+  useGetAccountsQuery,
+  type TransferStatus 
+} from "@/lib/store/api/muralPayApi"
 import { useToast } from "@/components/ui/use-toast"
 
 const STATUS_COLORS: Record<TransferStatus, { variant: "default" | "secondary" | "destructive", label: string }> = {
@@ -37,11 +42,11 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
   const [prevIds, setPrevIds] = useState<string[]>([])
   const { toast } = useToast()
 
+  const { data: accounts } = useGetAccountsQuery()
   const { data, isLoading } = useGetTransferRequestsQuery({
     limit: 20,
     nextId,
     status: selectedStatus === "ALL" ? undefined : [selectedStatus],
-    accountId,
   })
 
   const [executeTransfer] = useExecuteTransferRequestMutation()
@@ -77,10 +82,15 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
     setNextId(prevId)
   }
 
+  const getAccountName = (accountId: string) => {
+    const account = accounts?.find(acc => acc.id === accountId)
+    return account?.name || accountId
+  }
+
   const filteredRequests = data?.results?.filter(
     (request) =>
-      request.memo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.payoutAccountId.toLowerCase().includes(searchQuery.toLowerCase())
+      (!accountId || request.payoutAccountId === accountId) &&
+      (getAccountName(request.payoutAccountId).toLowerCase().includes(searchQuery.toLowerCase()))
   ) || []
 
   return (
@@ -89,7 +99,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by memo or account"
+            placeholder="Search by account name"
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -118,24 +128,22 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
           <TableHeader>
             <TableRow>
               <TableHead>DATE</TableHead>
-              <TableHead>ACCOUNT</TableHead>
-              <TableHead>MEMO</TableHead>
-              <TableHead>RECIPIENTS</TableHead>
+              {!accountId && <TableHead>FROM</TableHead>}
+              <TableHead>AMOUNT (USD)</TableHead>
               <TableHead>STATUS</TableHead>
-              <TableHead>TRANSACTION</TableHead>
               <TableHead>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={accountId ? 4 : 5} className="text-center">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : !data?.results || filteredRequests.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={accountId ? 4 : 5} className="text-center">
                   No transfer requests found
                 </TableCell>
               </TableRow>
@@ -145,25 +153,21 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
                   <TableCell>
                     {format(new Date(request.createdAt), 'MMM dd, yyyy')}
                   </TableCell>
-                  <TableCell className="font-medium">{request.payoutAccountId}</TableCell>
-                  <TableCell>{request.memo || '-'}</TableCell>
+                  {!accountId && (
+                    <TableCell className="font-medium">
+                      {getAccountName(request.payoutAccountId)}
+                    </TableCell>
+                  )}
                   <TableCell>
-                    {request.recipientsInfo.map((recipient, index) => (
-                      <div key={recipient.id} className="text-sm">
-                        {recipient.tokenAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                        {index < request.recipientsInfo.length - 1 && ", "}
-                      </div>
-                    ))}
+                    <div className="text-sm font-medium">
+                      {request.recipientsInfo.reduce((total, recipient) => total + recipient.tokenAmount, 0)
+                        .toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_COLORS[request.status].variant}>
                       {STATUS_COLORS[request.status].label}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {request.transactionHash ? (
-                      <span className="text-sm font-mono">{request.transactionHash.slice(0, 8)}...</span>
-                    ) : '-'}
                   </TableCell>
                   <TableCell>
                     {request.status === 'PENDING' && (
@@ -184,7 +188,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
 
       <div className="flex justify-between items-center">
         <div className="text-sm text-muted-foreground">
-          Total: {data?.total || 0} requests
+          Total: {filteredRequests.length} requests
         </div>
         <div className="flex gap-2">
           <Button

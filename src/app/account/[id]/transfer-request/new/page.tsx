@@ -69,6 +69,8 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
   const [createTransferRequest] = useCreateTransferRequestMutation()
   const { data: bankDetails, isLoading: isBanksLoading } = useGetBankDetailsQuery([COLOMBIA_CURRENCY])
 
+  console.log(bankDetails)
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -96,12 +98,9 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
   })
 
   // Update bank name when bank code changes
-  const handleBankChange = (bankCode: string) => {
-    const selectedBank = bankDetails?.banks.find(bank => bank.bankCode === bankCode);
-    if (selectedBank) {
-      form.setValue('bankCode', selectedBank.bankCode);
-      form.setValue('bankName', selectedBank.bankName);
-    }
+  const handleBankChange = (bankName: string) => {
+    form.setValue('bankCode', bankName);
+    form.setValue('bankName', bankName);
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -349,11 +348,17 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {bankDetails?.banks.map((bank) => (
-                              <SelectItem key={bank.bankCode} value={bank.bankCode}>
-                                {bank.bankName}
-                              </SelectItem>
-                            ))}
+                            {isBanksLoading ? (
+                              <SelectItem value="loading" disabled>Loading banks...</SelectItem>
+                            ) : !bankDetails?.[0]?.bankNames ? (
+                              <SelectItem value="empty" disabled>No banks available</SelectItem>
+                            ) : (
+                              bankDetails[0].bankNames.map((bankName) => (
+                                <SelectItem key={bankName} value={bankName}>
+                                  {bankName}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />

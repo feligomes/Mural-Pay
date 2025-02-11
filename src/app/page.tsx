@@ -5,6 +5,8 @@ import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
 import type { Account } from "@/lib/store/api/muralPayApi"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { TransferRequestsTable } from "@/components/transfer-requests-table"
 
 export default function AccountsPage() {
   const { data: accounts, isLoading, error } = useGetAccountsQuery()
@@ -66,6 +68,15 @@ export default function AccountsPage() {
           </Link>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Transfer Requests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TransferRequestsTable />
+        </CardContent>
+      </Card>
     </div>
   )
 }

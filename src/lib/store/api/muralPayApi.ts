@@ -28,12 +28,25 @@ export type TransferStatus = 'IN_REVIEW' | 'CANCELLED' | 'PENDING' | 'EXECUTED' 
 export type RecipientTransferType = 'FIAT' | 'BLOCKCHAIN';
 export type RecipientType = 'INDIVIDUAL' | 'BUSINESS';
 
+type WithdrawalRequestStatus = 'AWAITING_SOURCE_DEPOSIT' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
+type FiatCurrencyCode = 'USD' | 'COP' | 'ARS' | 'EUR' | 'MXN' | 'BRL' | 'CLP' | 'PEN' | 'BOB' | 'CRC' | 'ZAR';
+type BlockchainType = 'ETHEREUM' | 'POLYGON' | 'BASE' | 'CELO';
+
 interface FiatDetails {
-  // Add fiat details properties as needed
+  withdrawalRequestStatus: WithdrawalRequestStatus;
+  currencyCode: FiatCurrencyCode;
+  fiatAmount: number;
+  transactionFee: number;
+  exchangeFeePercentage: number;
+  exchangeRate: number;
+  feeTotal: number;
+  initiatedAt: string;
+  completedAt?: string;
 }
 
 interface BlockchainDetails {
-  // Add blockchain details properties as needed
+  walletAddress: string;
+  blockchain: BlockchainType;
 }
 
 interface Recipient {
@@ -115,56 +128,10 @@ interface BankDetails {
 }
 
 interface GetBankDetailsResponse {
-  banks: BankDetails[];
+  fiatCurrencyCode: string;
+  bankNames: string[];
+  matchingBankNameRequired: boolean;
 }
-
-// Hardcoded Colombian banks
-const COLOMBIAN_BANKS: BankDetails[] = [
-  { bankName: "Bancamia S.A.", bankCode: "BCMIA" },
-  { bankName: "Banco Agrario", bankCode: "BAGRI" },
-  { bankName: "Banco Av. Villas", bankCode: "BAVVI" },
-  { bankName: "Banco Caja Social BCSC", bankCode: "BCAJA" },
-  { bankName: "Banco Credifinanciera S.A.", bankCode: "BCRED" },
-  { bankName: "Banco Dale", bankCode: "BDALE" },
-  { bankName: "Banco Davivienda", bankCode: "BDAVI" },
-  { bankName: "Banco de Bogota", bankCode: "BBOGO" },
-  { bankName: "Banco de Occidente", bankCode: "BOCCI" },
-  { bankName: "Banco Falabella S.A.", bankCode: "BFALA" },
-  { bankName: "Banco Finandina S.A.", bankCode: "BFINA" },
-  { bankName: "Banco J.P. Morgan Colombia S.A.", bankCode: "BJPMC" },
-  { bankName: "Banco Mundo Mujer", bankCode: "BMUND" },
-  { bankName: "Banco Pichincha", bankCode: "BPICH" },
-  { bankName: "Banco Popular", bankCode: "BPOPU" },
-  { bankName: "Banco Procredit", bankCode: "BPROC" },
-  { bankName: "Banco Santander de Negocios Colombia S.A.", bankCode: "BSANT" },
-  { bankName: "Banco Serfinanza S.A.", bankCode: "BSERF" },
-  { bankName: "Banco Sudameris", bankCode: "BSUDA" },
-  { bankName: "Banco W S.A.", bankCode: "BWSA" },
-  { bankName: "Bancoldex S.A.", bankCode: "BCOLD" },
-  { bankName: "Bancolombia", bankCode: "BCOLO" },
-  { bankName: "Bancoomeva", bankCode: "BCOOM" },
-  { bankName: "BBVA", bankCode: "BBVA" },
-  { bankName: "Citibank", bankCode: "CITI" },
-  { bankName: "Coltefinanciera S.A.", bankCode: "COLTE" },
-  { bankName: "Confiar", bankCode: "CONFI" },
-  { bankName: "Coofinep Cooperativa Financiera", bankCode: "COOFN" },
-  { bankName: "Coopcentral S.A.", bankCode: "COOPC" },
-  { bankName: "Cooperativa Financiera de Antioquia", bankCode: "COOPA" },
-  { bankName: "Corpbanca Itau", bankCode: "CORPI" },
-  { bankName: "Cotrafa Cooperativa Financiera", bankCode: "COTRA" },
-  { bankName: "Daviplata", bankCode: "DAVIP" },
-  { bankName: "Financiera Juriscoop", bankCode: "JURIS" },
-  { bankName: "Giros y Finanzas CF", bankCode: "GIROS" },
-  { bankName: "Iris", bankCode: "IRIS" },
-  { bankName: "Itau", bankCode: "ITAU" },
-  { bankName: "LULO BANK S.A.", bankCode: "LULO" },
-  { bankName: "MiBanco S.A.", bankCode: "MIBAN" },
-  { bankName: "Movii", bankCode: "MOVII" },
-  { bankName: "Nequi", bankCode: "NEQUI" },
-  { bankName: "NU COLOMBIA", bankCode: "NUCOL" },
-  { bankName: "Rappipay", bankCode: "RAPPI" },
-  { bankName: "Scotiabank Colpatria", bankCode: "SCOTI" }
-];
 
 export const muralPayApi = createApi({
   reducerPath: 'muralPayApi',
@@ -186,10 +153,14 @@ export const muralPayApi = createApi({
         body,
       }),
     }),
-    getBankDetails: builder.query<GetBankDetailsResponse, string[]>({
-      queryFn: () => {
-        // Return hardcoded data instead of making API call
-        return { data: { banks: COLOMBIAN_BANKS } };
+    getBankDetails: builder.query<GetBankDetailsResponse[], string[]>({
+      query: (currencies) => {
+        const params = new URLSearchParams();
+        currencies.forEach(currency => params.append('fiatCurrencyCodes[]', currency));
+        return {
+          url: '/bank-accounts/get-bank-details-info',
+          params,
+        };
       },
     }),
     getTransferRequests: builder.query<GetTransferRequestsResponse, GetTransferRequestsParams>({
@@ -197,7 +168,7 @@ export const muralPayApi = createApi({
         const params = new URLSearchParams();
         if (limit) params.append('limit', limit.toString());
         if (nextId) params.append('nextId', nextId);
-        if (status?.length) status.forEach(s => params.append('status', s));
+        if (status?.length) status.forEach(s => params.append('status[]', s));
         if (accountId) params.append('accountId', accountId);
         
         return {
