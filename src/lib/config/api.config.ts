@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-    BASE_URL: 'https://api-staging.muralpay.com/api',
-    API_KEY: '6156b5eab878eefe2ace3af4:2310090bce2b6edf678164e6f40e4cb5a5c460e524a84b51b114249be693ca1d0aa1ea7d:94bcca99e9ef7afc17535ad7456da843.c343b9a378dc9cefeda7fdbe883b3f4be15dd8bb8e89e478f74d025c06f4a4b1',
-    MURAL_ACCOUNT_API_KEY: '3b3f528365d2838c60e0a58a:4eb1d03911e65be82712cc28ad776fda907dfe94966638d674bad1d3c5c167474613f01a:29c59899d49966a6e07288b42248eccd.39f4590ff98131bc9b21c4efe69d68dae3de0da5de61a89a3cf3cbbfb9638916'
+    BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-staging.muralpay.com/api',
+    API_KEY: process.env.MURAL_PAY_API_KEY || '',
+    MURAL_ACCOUNT_API_KEY: process.env.MURAL_ACCOUNT_API_KEY || ''
 }; 
