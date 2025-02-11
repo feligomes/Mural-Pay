@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useState } from "react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -40,7 +38,6 @@ export default function NewAccountPage() {
       router.refresh()
     } catch (error) {
       console.error("Failed to create account:", error)
-      // You might want to show an error toast here
     }
   }
 

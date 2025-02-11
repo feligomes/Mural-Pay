@@ -192,6 +192,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
                     {request.status === 'IN_REVIEW' && (
                       <Button
                         size="sm"
+                        style={{ height: "30px !important" }}
                         onClick={() => setConfirmExecuteId(request.id)}
                         disabled={isExecuting}
                       >
@@ -235,7 +236,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
                   Executing...
                 </>
               ) : (
-                'Confirm Execute'
+                'Confirm'
               )}
             </Button>
           </DialogFooter>

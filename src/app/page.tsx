@@ -4,7 +4,6 @@ import Link from "next/link"
 import { Plus, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
-import type { Account } from "@/lib/store/api/muralPayApi"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TransferRequestsTable } from "@/components/transfer-requests-table"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -71,7 +70,7 @@ export default function AccountsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Accounts</h1>
         <Link href="/account/new">
-          <Button>
+          <Button size={"default"}>
             <Plus className="mr-2 h-4 w-4" />
             Create new
           </Button>

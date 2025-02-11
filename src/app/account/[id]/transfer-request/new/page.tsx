@@ -28,7 +28,6 @@ const COLOMBIA_CURRENCY = "COP"
 
 const formSchema = z.object({
   memo: z.string().optional(),
-  // Recipient Info
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
@@ -38,7 +37,6 @@ const formSchema = z.object({
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)), "Must be a valid number")
     .refine((val) => Number(val) > 0, "Amount must be greater than 0"),
-  // Bank Details
   bankCode: z.string().min(1, "Bank code is required"),
   bankName: z.string().min(1, "Bank name is required"),
   bankAccountOwnerName: z.string().min(1, "Account owner name is required"),
@@ -52,7 +50,6 @@ const formSchema = z.object({
     .min(6, "Document number must be at least 6 digits")
     .max(12, "Document number must not exceed 12 digits")
     .regex(/^\d+$/, "Document number must contain only digits"),
-  // Physical Address
   address1: z.string().min(1, "Address is required"),
   address2: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
@@ -86,7 +83,6 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
       bankAccountNumber: "",
       documentType: "NATIONAL_ID",
       documentNumber: "",
-      // Physical Address defaults
       address1: "",
       address2: "",
       city: "",
@@ -95,14 +91,12 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
     },
   })
 
-  // Update bank name when bank code changes
   const handleBankChange = (bankName: string) => {
     form.setValue('bankCode', bankName);
     form.setValue('bankName', bankName);
   };
 
   const onSubmit = async (values: FormValues) => {
-    // Validate document number length based on type
     const numVal = values.documentNumber.replace(/\D/g, '');
     let isValidDocumentNumber = true;
     let documentError = "";
