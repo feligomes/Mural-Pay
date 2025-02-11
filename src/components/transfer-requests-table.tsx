@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
@@ -43,7 +43,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
   const { toast } = useToast()
 
   const { data: accounts } = useGetAccountsQuery()
-  const { data, isLoading } = useGetTransferRequestsQuery({
+  const { data, isFetching } = useGetTransferRequestsQuery({
     limit: 20,
     nextId,
     status: selectedStatus === "ALL" ? undefined : [selectedStatus],
@@ -105,22 +105,24 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Select
-          value={selectedStatus}
-          onValueChange={(value) => setSelectedStatus(value as TransferStatus | "ALL")}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Statuses</SelectItem>
-            <SelectItem value="IN_REVIEW">In Review</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="EXECUTED">Executed</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
-            <SelectItem value="FAILED">Failed</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select
+            value={selectedStatus}
+            onValueChange={(value) => setSelectedStatus(value as TransferStatus | "ALL")}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value="IN_REVIEW">In Review</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="EXECUTED">Executed</SelectItem>
+              <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              <SelectItem value="FAILED">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -135,10 +137,12 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {isFetching ? (
               <TableRow>
-                <TableCell colSpan={accountId ? 4 : 5} className="text-center">
-                  Loading...
+                <TableCell colSpan={accountId ? 4 : 5} className="h-24">
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
                 </TableCell>
               </TableRow>
             ) : !data?.results || filteredRequests.length === 0 ? (

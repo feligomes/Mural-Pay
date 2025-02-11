@@ -7,14 +7,53 @@ import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
 import type { Account } from "@/lib/store/api/muralPayApi"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TransferRequestsTable } from "@/components/transfer-requests-table"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function AccountsPage() {
   const { data: accounts, isLoading, error } = useGetAccountsQuery()
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div>Loading accounts...</div>
+      <div className="container mx-auto py-6 space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Accounts</h1>
+          <Link href="/account/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create new
+            </Button>
+          </Link>
+        </div>
+
+        <div className="space-y-4">
+          {[1, 2].map((index) => (
+            <div key={index} className="rounded-lg border p-6">
+              <div className="flex justify-between items-start mb-8">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="text-right space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-8 w-32" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-4 w-96" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>All Transfer Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TransferRequestsTable />
+          </CardContent>
+        </Card>
       </div>
     )
   }

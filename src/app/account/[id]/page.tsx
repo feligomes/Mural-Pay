@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TransferRequestsTable } from "@/components/transfer-requests-table"
 import { useGetAccountById } from "@/lib/store/api/muralPayApi"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function AccountPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
@@ -15,8 +16,58 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div>Loading account...</div>
+      <div className="container mx-auto py-6 space-y-8">
+        <div className="mb-6">
+          <Link href="/">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Accounts
+            </Button>
+          </Link>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-10 w-64" />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+              <LineChart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-40" />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Wallet Address</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-5 w-full" />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Network</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-32" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Transfer Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TransferRequestsTable accountId={resolvedParams.id} />
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -78,7 +129,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             <CardTitle className="text-sm font-medium">Wallet Address</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-sm font-mono">{account.address}</div>
+            <div className="text-sm font-mono" style={{ paddingTop : "6px" }}>{account.address}</div>
           </CardContent>
         </Card>
 

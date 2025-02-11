@@ -1,11 +1,12 @@
 "use client"
 
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -22,7 +23,7 @@ const formSchema = z.object({
 
 export default function NewAccountPage() {
   const router = useRouter()
-  const [createAccount] = useCreateAccountMutation()
+  const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -96,8 +97,9 @@ export default function NewAccountPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={isCreating}>
+                {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isCreating ? "Creating..." : "Create Account"}
               </Button>
             </form>
           </Form>

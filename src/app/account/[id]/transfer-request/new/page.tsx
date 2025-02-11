@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { use } from "react"
@@ -66,10 +66,8 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
   const resolvedParams = use(params)
   const router = useRouter()
   const { toast } = useToast()
-  const [createTransferRequest] = useCreateTransferRequestMutation()
+  const [createTransferRequest, { isLoading: isCreating }] = useCreateTransferRequestMutation()
   const { data: bankDetails, isLoading: isBanksLoading } = useGetBankDetailsQuery([COLOMBIA_CURRENCY])
-
-  console.log(bankDetails)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -177,11 +175,11 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
       })
       router.push(`/account/${resolvedParams.id}`)
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create transfer request:", error)
       toast({
         title: "Error",
-        description: "Failed to create transfer request",
+        description: error.data?.message || "Failed to create transfer request",
         variant: "destructive",
       })
     }
@@ -531,8 +529,9 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
                 </div>
               </div>
 
-              <Button type="submit" className="w-full">
-                Create Transfer Request
+              <Button type="submit" className="w-full" disabled={isCreating}>
+                {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isCreating ? "Creating..." : "Create Transfer Request"}
               </Button>
             </form>
           </Form>
