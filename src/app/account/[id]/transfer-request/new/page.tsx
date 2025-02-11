@@ -200,7 +200,7 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
         <CardHeader>
           <CardTitle>New Transfer Request (Colombia)</CardTitle>
           <CardDescription>
-            Create a new transfer request to send funds to a Colombian bank account.
+            Create a new transfer request, limited to Colombian bank accounts.
           </CardDescription>
         </CardHeader>
         <CardContent>

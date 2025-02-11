@@ -133,6 +133,23 @@ interface GetBankDetailsResponse {
   matchingBankNameRequired: boolean;
 }
 
+interface ExecuteTransferResponse {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  payoutAccountId: string;
+  memo?: string;
+  status: TransferStatus;
+  recipientsInfo: {
+    id: string;
+    currencyCode: string;
+    tokenAmount: number;
+    createdAt: string;
+    updatedAt: string;
+    withdrawalRequestStatus: WithdrawalRequestStatus;
+  }[];
+}
+
 export const muralPayApi = createApi({
   reducerPath: 'muralPayApi',
   baseQuery: fetchBaseQuery({
@@ -184,7 +201,7 @@ export const muralPayApi = createApi({
         body,
       }),
     }),
-    executeTransferRequest: builder.mutation<void, string>({
+    executeTransferRequest: builder.mutation<ExecuteTransferResponse, string>({
       query: (transferRequestId) => ({
         url: '/transfer-requests/execute',
         method: 'POST',

@@ -15,6 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { 
   useGetTransferRequestsQuery, 
   useExecuteTransferRequestMutation, 
@@ -40,6 +48,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
   const [selectedStatus, setSelectedStatus] = useState<TransferStatus | "ALL">("ALL")
   const [nextId, setNextId] = useState<string>()
   const [prevIds, setPrevIds] = useState<string[]>([])
+  const [confirmExecuteId, setConfirmExecuteId] = useState<string | null>(null)
   const { toast } = useToast()
 
   const { data: accounts } = useGetAccountsQuery()
@@ -49,20 +58,24 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
     status: selectedStatus === "ALL" ? undefined : [selectedStatus],
   })
 
-  const [executeTransfer] = useExecuteTransferRequestMutation()
+  console.log("accounts", accounts)
+  console.log("data", data)
+
+  const [executeTransfer, { isLoading: isExecuting }] = useExecuteTransferRequestMutation()
 
   const handleExecute = async (transferRequestId: string) => {
     try {
-      await executeTransfer(transferRequestId).unwrap()
+      const response = await executeTransfer(transferRequestId).unwrap()
+      setConfirmExecuteId(null)
       toast({
         title: "Success",
-        description: "Transfer request executed successfully",
+        description: `Transfer request status changed to ${STATUS_COLORS[response.status].label}`,
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to execute transfer:", error)
       toast({
         title: "Error",
-        description: "Failed to execute transfer request",
+        description: error.data?.message || "Failed to execute transfer request",
         variant: "destructive",
       })
     }
@@ -90,27 +103,29 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
   const filteredRequests = data?.results?.filter(
     (request) =>
       (!accountId || request.payoutAccountId === accountId) &&
-      (getAccountName(request.payoutAccountId).toLowerCase().includes(searchQuery.toLowerCase()))
+      (!searchQuery || !accountId && getAccountName(request.payoutAccountId).toLowerCase().includes(searchQuery.toLowerCase()))
   ) || []
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by account name"
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        {!accountId && (
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by account name"
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        )}
+        <div className="flex items-center">
           <Select
             value={selectedStatus}
             onValueChange={(value) => setSelectedStatus(value as TransferStatus | "ALL")}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -125,15 +140,15 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>DATE</TableHead>
-              {!accountId && <TableHead>FROM</TableHead>}
-              <TableHead>AMOUNT (USD)</TableHead>
-              <TableHead>STATUS</TableHead>
-              <TableHead>ACTIONS</TableHead>
+              <TableHead className="whitespace-nowrap">DATE</TableHead>
+              {!accountId && <TableHead className="whitespace-nowrap">FROM</TableHead>}
+              <TableHead className="whitespace-nowrap">AMOUNT (USD)</TableHead>
+              <TableHead className="whitespace-nowrap">STATUS</TableHead>
+              <TableHead className="whitespace-nowrap">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -154,32 +169,40 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
             ) : (
               filteredRequests.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {format(new Date(request.createdAt), 'MMM dd, yyyy')}
                   </TableCell>
                   {!accountId && (
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium whitespace-nowrap">
                       {getAccountName(request.payoutAccountId)}
                     </TableCell>
                   )}
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <div className="text-sm font-medium">
                       {request.recipientsInfo.reduce((total, recipient) => total + recipient.tokenAmount, 0)
                         .toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <Badge variant={STATUS_COLORS[request.status].variant}>
                       {STATUS_COLORS[request.status].label}
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    {request.status === 'PENDING' && (
+                  <TableCell className="whitespace-nowrap">
+                    {request.status === 'IN_REVIEW' && (
                       <Button
                         size="sm"
-                        onClick={() => handleExecute(request.id)}
+                        onClick={() => setConfirmExecuteId(request.id)}
+                        disabled={isExecuting}
                       >
-                        Execute
+                        {isExecuting && confirmExecuteId === request.id ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Executing...
+                          </>
+                        ) : (
+                          'Execute'
+                        )}
                       </Button>
                     )}
                   </TableCell>
@@ -190,16 +213,46 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
         </Table>
       </div>
 
-      <div className="flex justify-between items-center">
+      <Dialog open={!!confirmExecuteId} onOpenChange={() => setConfirmExecuteId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Execute Transfer</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to execute this transfer request? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmExecuteId(null)} disabled={isExecuting}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => confirmExecuteId && handleExecute(confirmExecuteId)}
+              disabled={isExecuting}
+            >
+              {isExecuting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Executing...
+                </>
+              ) : (
+                'Confirm Execute'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="text-sm text-muted-foreground">
           Total: {filteredRequests.length} requests
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrevPage}
             disabled={prevIds.length === 0}
+            className="flex-1 sm:flex-none"
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
             Previous
@@ -209,6 +262,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
             size="sm"
             onClick={handleNextPage}
             disabled={!data?.nextId}
+            className="flex-1 sm:flex-none"
           >
             Next
             <ChevronRight className="h-4 w-4 ml-1" />
