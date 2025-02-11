@@ -5,8 +5,8 @@ import { Plus, Wallet } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { TransferRequestsTable } from "@/components/transfer-requests-table"
 import { Skeleton } from "@/components/ui/skeleton"
+import { TransferRequestsTable } from "@/components/transfer-requests-table"
 
 export default function AccountsPage() {
   const { data: accounts, isLoading, error } = useGetAccountsQuery()

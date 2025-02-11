@@ -6,9 +6,9 @@ import { use } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TransferRequestsTable } from "@/components/transfer-requests-table"
 import { useGetAccountById } from "@/lib/store/api/muralPayApi"
 import { Skeleton } from "@/components/ui/skeleton"
+import { TransferRequestsTable } from "@/components/transfer-requests-table"
 
 export default function AccountPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
