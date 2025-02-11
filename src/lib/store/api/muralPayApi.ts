@@ -25,9 +25,11 @@ export const muralPayApi = createApi({
             return headers;
         },
     }),
+    tagTypes: ['Account', 'TransferRequest'],
     endpoints: (builder) => ({
         getAccounts: builder.query<Account[], void>({
             query: () => '/accounts',
+            providesTags: ['Account']
         }),
         createAccount: builder.mutation<Account, CreateAccountRequest>({
             query: (body) => ({
@@ -35,6 +37,7 @@ export const muralPayApi = createApi({
                 method: 'POST',
                 body,
             }),
+            invalidatesTags: ['Account']
         }),
         getBankDetails: builder.query<GetBankDetailsResponse[], string[]>({
             query: (currencies) => {
@@ -59,6 +62,7 @@ export const muralPayApi = createApi({
                     params,
                 };
             },
+            providesTags: ['TransferRequest']
         }),
         createTransferRequest: builder.mutation<TransferRequest, CreateTransferRequest>({
             query: (body) => ({
@@ -66,6 +70,7 @@ export const muralPayApi = createApi({
                 method: 'POST',
                 body,
             }),
+            invalidatesTags: ['TransferRequest']
         }),
         executeTransferRequest: builder.mutation<ExecuteTransferResponse, string>({
             query: (transferRequestId) => ({
@@ -76,6 +81,7 @@ export const muralPayApi = createApi({
                     'mural-account-api-key': API_CONFIG.MURAL_ACCOUNT_API_KEY
                 }
             }),
+            invalidatesTags: ['TransferRequest']
         }),
     }),
 });

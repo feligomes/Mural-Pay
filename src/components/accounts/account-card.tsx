@@ -23,12 +23,13 @@ export function AccountCard({ account }: AccountCardProps) {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-muted-foreground gap-2">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            {account.address.slice(0, 4)}...{account.address.slice(-4)}
-          </div>
-          {account.isPending && (
+          {account.isPending ? (
             <span className="text-yellow-600">Pending</span>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Wallet className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              {account.address.slice(0, 4)}...{account.address.slice(-4)}
+            </div>
           )}
         </div>
       </div>
