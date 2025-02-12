@@ -1,6 +1,6 @@
 # MuralPay
 
-A Next.js application for managing transfer requests and accounts. This application allows users to create accounts and manage transfer requests integrating with mural pay api and limited to Colombian transactions for now.
+A Next.js application for managing transfer requests and accounts. This application allows users to create accounts and manage transfer requests through the Mural Pay API. Currently supports Colombian banks and transactions.
 
 🌐 **Live Demo**: [https://mural-pay.vercel.app/](https://mural-pay.vercel.app/)
 
@@ -62,37 +62,36 @@ yarn dev
 
 ## Important Notes
 
-1. **Colombian Address Handling**:
-   - The API requieres a second address for Colombian addresses
+1. **Colombian Address Format**:
+   - The API requires a secondary address line
 
 2. **Phone Number Format**:
-   - A Colombian phone numbers must be used for the requests
+   - Colombian phone numbers are required for all requests
 
 3. **Transfer Request Filtering**:
-   - Currently, transfer request filtering is implemented on the frontend
-   - This is due to API limitations in the provided endpoints, filtering by account is not available
+   - Transfer request filtering is currently implemented client-side because the API does not support filtering by account
 
 4. **Transfer Request Display**:
-   - The transfer requests table shows the "From" field
-   - "To" field information is not available in the list endpoint response
-   - If the API ends up providing more info we could make more descriptive rows
+   - The transfer requests table displays a "From" field showing the account name
+   - The "To" field is currently unavailable as this information is not provided by the API endpoint. This may be added in future updates to improve transfer request clarity.
 
-5. **Account Deletion**:
-   - The API doesnt allow to delete accounts, for these reason when testing the dashboard may get over populated with accounts. 
-   - To prevent this I implement a show more concept for the cards in the dashboard and ordering them with the last updated at the top. 
+5. **Account Management**:
+   - The API does not support account deletion
+   - To manage dashboard clutter, accounts are displayed using a "Show More" pagination system
+   - Accounts are sorted by last update date, with most recent updates appearing first
 
-## Possible future Improvements
+## Potential Future Improvements
 
 1. **Enhanced API Integration**:
-   - Integration with recipient information in transfer request listings
-   - Expanded transaction details in API responses
+   - Include recipient information in transfer request listings
+   - Expand transaction details in API responses
 
 2. **User Experience**:
-   - Add bulk transfer request operations
-   - Implement real-time status updates using WebSocket
-   - Enhanced transaction history visualization
-   - Export functionality for transfer requests
-   - Posibility to see the details of a transfer request
+   - Implement bulk transfer request operations
+   - Add real-time status updates using WebSocket
+   - Enhance transaction history visualization
+   - Add export functionality for transfer requests
+   - Enable detailed view of transfer requests
 
 3. **Internationalization**:
    - Support for multiple countries beyond Colombia
