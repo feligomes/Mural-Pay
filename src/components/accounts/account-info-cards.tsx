@@ -2,11 +2,11 @@ import { LineChart, Wallet, Globe } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Account } from "@/lib/interfaces/account.interface"
 
-export function AccountInfoCards({ account }: { account: Account }) {
+export function AccountInfoCards({ account }: { account?: Account }) {
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold break-all">Account: {account.name}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold break-all">Account: {account?.name}</h1>
       </div>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -17,7 +17,7 @@ export function AccountInfoCards({ account }: { account: Account }) {
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold break-all">
-              ${account.balance.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })} {account.balance.tokenSymbol}
+              ${account?.balance.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })} {account?.balance.tokenSymbol}
             </div>
           </CardContent>
         </Card>
@@ -28,7 +28,7 @@ export function AccountInfoCards({ account }: { account: Account }) {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-sm font-mono break-all" style={{ paddingTop: "6px" }}>{account.address}</div>
+            <div className="text-sm font-mono break-all" style={{ paddingTop: "6px" }}>{account?.address}</div>
           </CardContent>
         </Card>
 
@@ -38,7 +38,7 @@ export function AccountInfoCards({ account }: { account: Account }) {
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{account.blockchain}</div>
+            <div className="text-xl sm:text-2xl font-bold">{account?.blockchain}</div>
           </CardContent>
         </Card>
       </div>

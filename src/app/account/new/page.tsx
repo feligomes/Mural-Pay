@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useCreateAccountMutation } from "@/lib/store/api/muralPayApi"
 import type { CreateAccountRequest } from "@/lib/store/api/muralPayApi"
 import { useToast } from "@/components/ui/use-toast"
+import type { ApiError } from "@/lib/interfaces/api.interface"
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -42,8 +43,13 @@ export default function NewAccountPage() {
       })
       router.push("/")
       router.refresh()
-    } catch (error) {
+    } catch (error: ApiError) {
       console.error("Failed to create account:", error)
+      toast({
+        title: "Error",
+        description: error.data?.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 

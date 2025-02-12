@@ -68,6 +68,8 @@ export default function AccountsPage() {
           <Button
             variant="outline"
             onClick={() => setShowAll(true)}
+            aria-label="Show more accounts"
+            aria-expanded={showAll}
           >
             Show More Accounts
           </Button>

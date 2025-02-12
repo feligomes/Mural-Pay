@@ -40,7 +40,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
       {isLoading ? (
         <AccountInfoSkeleton />
       ) : (
-        <AccountInfoCards account={account!} />
+        <AccountInfoCards account={account} />
       )}
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
