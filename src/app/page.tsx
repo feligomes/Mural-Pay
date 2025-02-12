@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Plus } from "lucide-react"
+import type { ApiError } from "@/lib/interfaces/api.interface"
 import { Button } from "@/components/ui/button"
 import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -29,7 +30,7 @@ export default function AccountsPage() {
   if (error) {
     return (
       <div className="container mx-auto py-6">
-        <div className="text-red-500">Error loading accounts: {error.toString()}</div>
+        <div className="text-red-500">Error loading accounts: {(error as ApiError).data.message || error.toString()}</div>
       </div>
     )
   }

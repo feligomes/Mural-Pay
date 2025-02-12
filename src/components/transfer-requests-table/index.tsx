@@ -10,6 +10,7 @@ import {
 } from "@/lib/store/api/muralPayApi"
 import { useToast } from "@/components/ui/use-toast"
 import { TransferStatus } from "@/lib/interfaces/transfer.interface"
+import type { ApiError } from "@/lib/interfaces/api.interface"
 import { ExecuteDialog } from "./execute-dialog"
 import { SearchFilters } from "./search-filters"
 import { Pagination } from "./pagination"
@@ -47,11 +48,12 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
         title: "Success",
         description: `Transfer request status changed to ${response.status}`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to execute transfer:", error)
+      const apiError = error as ApiError
       toast({
         title: "Error",
-        description: error.data?.message || "Failed to execute transfer request",
+        description: apiError.data.message || "Failed to execute transfer request",
         variant: "destructive",
       })
     }

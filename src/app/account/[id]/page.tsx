@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { use } from "react"
+import type { ApiError } from "@/lib/interfaces/api.interface"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,7 +20,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
   if (error) {
     return (
       <div className="container mx-auto py-6">
-        <div>Error loading account: {error.toString()}</div>
+        <div>Error loading account: {(error as ApiError).data.message || error.toString()}</div>
       </div>
     )
   }

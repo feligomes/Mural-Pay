@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { use } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { ApiError } from "@/lib/interfaces/api.interface"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -105,11 +106,12 @@ export default function NewTransferRequestPage({ params }: { params: Promise<{ i
       })
       router.push(`/account/${resolvedParams.id}`)
       router.refresh()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create transfer request:", error)
+      const apiError = error as ApiError
       toast({
         title: "Error",
-        description: error.data?.message || "Failed to create transfer request",
+        description: apiError.data.message || "Failed to create transfer request",
         variant: "destructive",
       })
     }
