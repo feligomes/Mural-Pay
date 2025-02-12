@@ -31,7 +31,6 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
 
   const { data: accounts } = useGetAccountsQuery()
   const { data, isFetching } = useGetTransferRequestsQuery({
-    limit: 20,
     nextId,
     status: selectedStatus === "ALL" ? undefined : [selectedStatus],
   })
@@ -100,7 +99,7 @@ export function TransferRequestsTable({ accountId }: TransferRequestsTableProps)
           <TableBody>
             {isFetching ? (
               <TableRow>
-                <TableCell colSpan={accountId ? 4 : 5} className="h-24">
+                <TableCell colSpan={accountId ? 4 : 5} className="h-40">
                   <div className="flex items-center justify-center">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>

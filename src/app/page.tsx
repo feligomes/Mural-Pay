@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Plus } from "lucide-react"
+import { useState } from "react"
 import type { ApiError } from "@/lib/interfaces/api.interface"
 import { Button } from "@/components/ui/button"
 import { useGetAccountsQuery } from "@/lib/store/api/muralPayApi"
@@ -26,6 +27,7 @@ function PageHeader() {
 
 export default function AccountsPage() {
   const { data: accounts, isLoading, error } = useGetAccountsQuery()
+  const [showAll, setShowAll] = useState(false)
 
   if (error) {
     return (
@@ -35,22 +37,42 @@ export default function AccountsPage() {
     )
   }
 
+  // Sort accounts by updatedAt in descending order
+  const sortedAccounts = accounts?.slice().sort((a, b) => 
+    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  )
+
+  const displayedAccounts = showAll ? sortedAccounts : sortedAccounts?.slice(0, 4)
+  const hasMoreAccounts = accounts && accounts.length > 4
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6 sm:space-y-8">
+    <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6 sm:space-y-8 min-h-[500px]">
       <PageHeader />
 
-      <div className="space-y-3 sm:space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {isLoading ? (
-          <>
-            <AccountSkeleton />
-            <AccountSkeleton />
+          <>{[0,1,2,3].map((index) => (
+            <AccountSkeleton key={index} />
+          ))}
           </>
         ) : (
-          accounts?.map((account) => (
-            <AccountCard key={account.id} account={account} />
-          ))
+          <>
+            {displayedAccounts?.map((account) => (
+              <AccountCard key={account.id} account={account} />
+            ))}
+          </>
         )}
       </div>
+      {!showAll && hasMoreAccounts && (
+        <div className="flex justify-center pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowAll(true)}
+          >
+            Show More Accounts
+          </Button>
+        </div>
+      )}
 
       <Card>
         <CardHeader>

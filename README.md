@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MuralPay
+
+A Next.js application for managing transfer requests and accounts. This application allows users to create accounts and manage transfer requests integrating with mural pay api and limited to Colombian transactions for now.
+
+🌐 **Live Demo**: [https://mural-pay.vercel.app/](https://mural-pay.vercel.app/)
+
+## Features
+
+- Account management
+- Dynamic form validations
+- Transfer request creation and management
+- Different levels of filters for transfer requests
+- Responsive design of all the pages
+- Modern UI with a focus on user experience
+
+## Technologies Used
+
+- **Frontend Framework**: Next.js 14 with App Router
+- **Styling**: Tailwind CSS
+- **State Management**: Redux Toolkit
+- **Form Handling**: React Hook Form with Zod validation
+- **UI Components**: Shadcn/ui
+- **API Integration**: RTK Query
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18.17 or later
+- npm or yarn package manager
+- Git
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd mural-pay
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Create a `.env.local` file in the root directory and add required environment variables:
+```env
+NEXT_PUBLIC_API_URL=your_api_url_here
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Important Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Colombian Address Handling**:
+   - The API requieres a second address for Colombian addresses
 
-## Learn More
+2. **Phone Number Format**:
+   - A Colombian phone numbers must be used for the requests
 
-To learn more about Next.js, take a look at the following resources:
+3. **Transfer Request Filtering**:
+   - Currently, transfer request filtering is implemented on the frontend
+   - This is due to API limitations in the provided endpoints, filtering by account is not available
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Transfer Request Display**:
+   - The transfer requests table shows the "From" field
+   - "To" field information is not available in the list endpoint response
+   - If the API ends up providing more info we could make more descriptive rows
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. **Account Deletion**:
+   - The API doesnt allow to delete accounts, for these reason when testing the dashboard may get over populated with accounts. 
+   - To prevent this I implement a show more concept for the cards in the dashboard and ordering them with the last updated at the top. 
 
-## Deploy on Vercel
+## Possible future Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Enhanced API Integration**:
+   - Integration with recipient information in transfer request listings
+   - Expanded transaction details in API responses
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **User Experience**:
+   - Add bulk transfer request operations
+   - Implement real-time status updates using WebSocket
+   - Enhanced transaction history visualization
+   - Export functionality for transfer requests
+   - Posibility to see the details of a transfer request
+
+3. **Internationalization**:
+   - Support for multiple countries beyond Colombia
+   - Multi-language support
+   - Dynamic currency conversion
+
+4. **Advanced Features**:
+   - Scheduled transfers
+   - Recurring transfer requests
+   - Transfer request templates
+   - Advanced analytics and reporting
+
+## Development
+
+The project follows a modular structure:
+- `/src/app` - Next.js pages and routing
+- `/src/components` - Reusable UI components
+- `/src/lib` - Utilities, configurations, and schemas
+- `/src/hooks` - Custom React hooks
+- `/src/store` - Redux store and API configurations
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

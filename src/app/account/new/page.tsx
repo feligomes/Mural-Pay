@@ -13,14 +13,16 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useCreateAccountMutation } from "@/lib/store/api/muralPayApi"
 import type { CreateAccountRequest } from "@/lib/store/api/muralPayApi"
+import { useToast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
 })
 
 export default function NewAccountPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [createAccount, { isLoading: isCreating }] = useCreateAccountMutation()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -34,6 +36,10 @@ export default function NewAccountPage() {
   const onSubmit = async (data: CreateAccountRequest) => {
     try {
       await createAccount(data).unwrap()
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+      })
       router.push("/")
       router.refresh()
     } catch (error) {
@@ -81,7 +87,7 @@ export default function NewAccountPage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Add a description for your account"
