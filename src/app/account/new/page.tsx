@@ -43,11 +43,12 @@ export default function NewAccountPage() {
       })
       router.push("/")
       router.refresh()
-    } catch (error: ApiError) {
+    } catch (error: unknown) {
       console.error("Failed to create account:", error)
+      const apiError = error as ApiError
       toast({
         title: "Error",
-        description: error.data?.message || "Failed to create account. Please try again.",
+        description: apiError.data?.message || "Failed to create account. Please try again.",
         variant: "destructive",
       })
     }
